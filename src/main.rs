@@ -3,17 +3,24 @@ use std::time::Instant;
 
 fn main() {
     let now = Instant::now();
+    match combine() {
+        Ok(_) => {
+            let elapsed = now.elapsed();
+            println!("Done in {:?}", elapsed);
+        },
+        Err(e) => println!("Error: {}", e),
+    }
+}
 
-    let mut output = File::create("combined.txt").unwrap();
-    for entry in fs::read_dir("input").unwrap() {
-        let entry = entry.unwrap();
+fn combine() -> Result<(), std::io::Error> {
+    let mut output = File::create("combined.txt")?;
+    for entry in fs::read_dir("input")? {
+        let entry = entry?;
         let path = entry.path();
         if path.is_file() {
-            let mut input = File::open(path).unwrap();
-            io::copy(&mut input, &mut output).unwrap();
+            let mut input = File::open(path)?;
+            io::copy(&mut input, &mut output)?;
         }
     }
-
-    let elapsed = now.elapsed();
-    println!("Done in {:?}", elapsed);
+    Ok(())
 }
